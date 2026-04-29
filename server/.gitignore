@@ -1,0 +1,4 @@
+node_modules/
+chartdb.sqlite
+chartdb.sqlite-shm
+chartdb.sqlite-wal
