@@ -38,7 +38,7 @@ export interface CodeSnippetProps {
     className?: string;
     code: string;
     codeToCopy?: string;
-    language?: 'sql' | 'shell' | 'dbml';
+    language?: 'sql' | 'shell' | 'dbml' | 'typescript';
     loading?: boolean;
     autoScroll?: boolean;
     isComplete?: boolean;

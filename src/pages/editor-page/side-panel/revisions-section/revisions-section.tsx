@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import {
     Check,
+    Code2,
     GitCompareArrows,
     History,
     Pencil,
@@ -17,7 +18,9 @@ import { Button } from '@/components/button/button';
 import { Input } from '@/components/input/input';
 import { Spinner } from '@/components/spinner/spinner';
 import { useRevisions } from './use-revisions';
+import { RevisionDrizzleDialog } from './revision-drizzle-dialog';
 import type { DiagramRevision } from '@/lib/domain/diagram-revision';
+import type { Diagram } from '@/lib/domain/diagram';
 
 export interface RevisionsSectionProps {}
 
@@ -51,6 +54,14 @@ export const RevisionsSection: React.FC<RevisionsSectionProps> = () => {
     const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
     // Revision currently loaded read-only into the canvas (preview mode).
     const [previewingId, setPreviewingId] = useState<string | null>(null);
+    // Drizzle schema.ts dialog: holds the fetched snapshot + revision name.
+    const [drizzleTarget, setDrizzleTarget] = useState<{
+        diagram: Diagram;
+        name: string;
+    } | null>(null);
+    const [drizzleLoadingId, setDrizzleLoadingId] = useState<string | null>(
+        null
+    );
 
     const sorted = useMemo(
         () =>
@@ -86,6 +97,25 @@ export const RevisionsSection: React.FC<RevisionsSectionProps> = () => {
             return full?.diagram;
         },
         [diagramId, getRevision]
+    );
+
+    const handleDrizzle = useCallback(
+        async (revision: DiagramRevision) => {
+            setDrizzleLoadingId(revision.id);
+            try {
+                const diagram = await withRevisionDiagram(revision);
+                if (!diagram) throw new Error('missing');
+                setDrizzleTarget({ diagram, name: revision.name });
+            } catch {
+                toast({
+                    title: 'Could not generate Drizzle schema',
+                    variant: 'destructive',
+                });
+            } finally {
+                setDrizzleLoadingId(null);
+            }
+        },
+        [withRevisionDiagram, toast]
     );
 
     const handleRestore = useCallback(
@@ -384,6 +414,24 @@ export const RevisionsSection: React.FC<RevisionsSectionProps> = () => {
                                         <GitCompareArrows className="size-3.5" />
                                         Compare
                                     </Button>
+                                    <Button
+                                        size="sm"
+                                        variant="outline"
+                                        className="h-7 gap-1 px-2 text-xs"
+                                        onClick={() =>
+                                            void handleDrizzle(revision)
+                                        }
+                                        disabled={
+                                            drizzleLoadingId === revision.id
+                                        }
+                                    >
+                                        {drizzleLoadingId === revision.id ? (
+                                            <Spinner size="small" />
+                                        ) : (
+                                            <Code2 className="size-3.5" />
+                                        )}
+                                        Drizzle
+                                    </Button>
                                     {!readonly ? (
                                         <>
                                             <Button
@@ -434,6 +482,13 @@ export const RevisionsSection: React.FC<RevisionsSectionProps> = () => {
                     ))
                 )}
             </div>
+
+            <RevisionDrizzleDialog
+                open={drizzleTarget !== null}
+                onClose={() => setDrizzleTarget(null)}
+                diagram={drizzleTarget?.diagram ?? null}
+                revisionName={drizzleTarget?.name ?? ''}
+            />
         </section>
     );
 };
