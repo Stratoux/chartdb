@@ -206,6 +206,8 @@ describe('generateDrizzleSchema (mysql)', () => {
         const importLine = code
             .split('\n')
             .find((l) => l.includes('drizzle-orm/mysql-core'))!;
+        // The table constructor must be imported too.
+        expect(importLine).toContain('mysqlTable');
         expect(importLine).toContain('bigint');
         expect(importLine).toContain('varchar');
         expect(importLine).toContain('float');
@@ -215,6 +217,36 @@ describe('generateDrizzleSchema (mysql)', () => {
         // Not used -> must be absent.
         expect(importLine).not.toContain('json');
         expect(importLine).not.toContain('boolean');
+    });
+
+    it('imports every builder identifier it references (no missing imports)', () => {
+        const importLine = code
+            .split('\n')
+            .find((l) => l.includes('drizzle-orm/mysql-core'))!;
+        const imported = new Set(
+            importLine
+                .replace(/.*\{([^}]*)\}.*/, '$1')
+                .split(',')
+                .map((s) => s.trim())
+                .filter(Boolean)
+        );
+        // Chained methods are not imports; everything else called as `name(` is.
+        const methods = new Set([
+            'references',
+            'on',
+            'notNull',
+            'autoincrement',
+            'unique',
+            'default',
+            'primaryKey',
+        ]);
+        const missing = new Set<string>();
+        for (const m of code.matchAll(/(?::|\t)\s*([a-zA-Z]+)\(/g)) {
+            const id = m[1];
+            if (id === 'sql') continue; // imported separately from drizzle-orm
+            if (!methods.has(id) && !imported.has(id)) missing.add(id);
+        }
+        expect([...missing]).toEqual([]);
     });
 });
 

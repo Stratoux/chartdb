@@ -450,6 +450,12 @@ export const generateDrizzleSchema = (
     let usesSql = false;
     const tableBlocks: string[] = [];
 
+    // The table constructor itself (mysqlTable/pgTable/sqliteTable) must be
+    // imported whenever we emit at least one table.
+    if (tables.length > 0) {
+        usedImports.add(cfg.tableFn);
+    }
+
     for (const table of tables) {
         const exportName = tableExportById.get(table.id)!;
         const columnLines: string[] = [];
