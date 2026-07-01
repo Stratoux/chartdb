@@ -10,6 +10,7 @@ export const hr: LanguageTranslation = {
             dependencies: 'Ovisnosti',
             custom_types: 'Prilagođeni Tipovi',
             visuals: 'Vizuali',
+            revisions: 'Revizije',
         },
         menu: {
             actions: {
@@ -245,6 +246,10 @@ export const hr: LanguageTranslation = {
                     areas: 'Područja',
                     notes: 'Bilješke',
                 },
+            },
+
+            revisions_section: {
+                revisions: 'Revizije',
             },
 
             notes_section: {

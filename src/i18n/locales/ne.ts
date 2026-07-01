@@ -10,6 +10,7 @@ export const ne: LanguageTranslation = {
             dependencies: 'निर्भरताहरू',
             custom_types: 'कस्टम प्रकारहरू',
             visuals: 'Visuals',
+            revisions: 'संशोधनहरू',
         },
         menu: {
             actions: {
@@ -249,6 +250,10 @@ export const ne: LanguageTranslation = {
                     areas: 'क्षेत्रहरू',
                     notes: 'टिप्पणीहरू',
                 },
+            },
+
+            revisions_section: {
+                revisions: 'संशोधनहरू',
             },
 
             notes_section: {

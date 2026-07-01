@@ -575,8 +575,10 @@ describe('Apply DBML Changes - single table', () => {
                         },
                     ],
                     indexes: [],
-                    x: 300,
-                    y: 0,
+                    // New tables spawn next to the existing layout (source
+                    // table_1 is at x:260,y:80) instead of the import grid.
+                    x: 560,
+                    y: 80,
                     color: '#7175fa',
                     isView: false,
                     createdAt: 1753896522978,

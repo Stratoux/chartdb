@@ -10,6 +10,7 @@ export const hi: LanguageTranslation = {
             dependencies: 'निर्भरताएं',
             custom_types: 'कस्टम टाइप',
             visuals: 'Visuals',
+            revisions: 'संशोधन',
         },
         menu: {
             actions: {
@@ -250,6 +251,10 @@ export const hi: LanguageTranslation = {
                     areas: 'क्षेत्र',
                     notes: 'नोट्स',
                 },
+            },
+
+            revisions_section: {
+                revisions: 'संशोधन',
             },
 
             notes_section: {

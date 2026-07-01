@@ -9,6 +9,7 @@ import type { Area } from '@/lib/domain/area';
 import type { DBCustomType } from '@/lib/domain/db-custom-type';
 import type { DiagramFilter } from '@/lib/domain/diagram-filter/diagram-filter';
 import type { Note } from '@/lib/domain/note';
+import type { DiagramRevision } from '@/lib/domain/diagram-revision';
 
 export interface StorageContext {
     // Config operations
@@ -152,6 +153,27 @@ export interface StorageContext {
     deleteNote: (params: { diagramId: string; id: string }) => Promise<void>;
     listNotes: (diagramId: string) => Promise<Note[]>;
     deleteDiagramNotes: (diagramId: string) => Promise<void>;
+
+    // Revision operations (named full-diagram snapshots, server-side only)
+    listRevisions: (diagramId: string) => Promise<DiagramRevision[]>;
+    getRevision: (params: {
+        diagramId: string;
+        id: string;
+    }) => Promise<DiagramRevision | undefined>;
+    saveRevision: (params: {
+        diagramId: string;
+        name: string;
+        diagram: Diagram;
+    }) => Promise<DiagramRevision>;
+    renameRevision: (params: {
+        diagramId: string;
+        id: string;
+        name: string;
+    }) => Promise<void>;
+    deleteRevision: (params: {
+        diagramId: string;
+        id: string;
+    }) => Promise<void>;
 }
 
 export const storageInitialValue: StorageContext = {
@@ -212,6 +234,13 @@ export const storageInitialValue: StorageContext = {
     deleteNote: emptyFn,
     listNotes: emptyFn,
     deleteDiagramNotes: emptyFn,
+
+    // Revision operations
+    listRevisions: emptyFn,
+    getRevision: emptyFn,
+    saveRevision: emptyFn,
+    renameRevision: emptyFn,
+    deleteRevision: emptyFn,
 };
 
 export const storageContext =

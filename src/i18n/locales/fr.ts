@@ -10,6 +10,7 @@ export const fr: LanguageTranslation = {
             dependencies: 'Dépendances',
             custom_types: 'Types Personnalisés',
             visuals: 'Visuels',
+            revisions: 'Révisions',
         },
         menu: {
             actions: {
@@ -246,6 +247,10 @@ export const fr: LanguageTranslation = {
                     areas: 'Zones',
                     notes: 'Notes',
                 },
+            },
+
+            revisions_section: {
+                revisions: 'Révisions',
             },
 
             notes_section: {

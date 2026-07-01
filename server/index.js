@@ -120,6 +120,52 @@ app.delete('/api/diagrams/:diagramId', (req, res) => {
     res.json({ ok: true });
 });
 
+// ---------- Revisions ----------
+// Named, full-diagram snapshots. Stored server-side only; the client sends the
+// current diagram snapshot when creating a revision, and loads it in-memory when
+// previewing/restoring.
+app.get('/api/diagrams/:diagramId/revisions', (req, res) => {
+    res.json(store.listRevisions(req.params.diagramId));
+});
+
+app.get('/api/diagrams/:diagramId/revisions/:revisionId', (req, res) => {
+    const revision = store.getRevision(req.params.revisionId);
+    if (!revision || revision.diagramId !== req.params.diagramId) {
+        return res.status(404).json({ error: 'Not found' });
+    }
+    res.json(revision);
+});
+
+app.post('/api/diagrams/:diagramId/revisions', (req, res) => {
+    const { id, name, diagram, createdAt } = req.body ?? {};
+    if (!id) return res.status(400).json({ error: 'id required' });
+    if (!name || !name.trim())
+        return res.status(400).json({ error: 'name required' });
+    if (!diagram) return res.status(400).json({ error: 'diagram required' });
+    const revision = store.addRevision({
+        id,
+        diagramId: req.params.diagramId,
+        name: name.trim(),
+        diagram,
+        createdAt,
+    });
+    res.json(revision);
+});
+
+app.patch('/api/diagrams/:diagramId/revisions/:revisionId', (req, res) => {
+    const { name } = req.body ?? {};
+    if (!name || !name.trim())
+        return res.status(400).json({ error: 'name required' });
+    const ok = store.renameRevision(req.params.revisionId, name.trim());
+    if (!ok) return res.status(404).json({ error: 'Not found' });
+    res.json({ ok: true });
+});
+
+app.delete('/api/diagrams/:diagramId/revisions/:revisionId', (req, res) => {
+    store.deleteRevision(req.params.revisionId);
+    res.json({ ok: true });
+});
+
 // ---------- Generic collection routes ----------
 const COLLECTIONS = {
     tables: 'tables',

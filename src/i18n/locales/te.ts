@@ -10,6 +10,7 @@ export const te: LanguageTranslation = {
             dependencies: 'ఆధారతలు',
             custom_types: 'కస్టమ్ టైప్స్',
             visuals: 'Visuals',
+            revisions: 'సవరణలు',
         },
         menu: {
             actions: {
@@ -250,6 +251,10 @@ export const te: LanguageTranslation = {
                     areas: 'ప్రాంతాలు',
                     notes: 'గమనికలు',
                 },
+            },
+
+            revisions_section: {
+                revisions: 'సవరణలు',
             },
 
             notes_section: {

@@ -33,6 +33,17 @@ db.exec(`
         acquired_at INTEGER NOT NULL,
         last_heartbeat INTEGER NOT NULL
     );
+
+    CREATE TABLE IF NOT EXISTS revisions (
+        id TEXT PRIMARY KEY,
+        diagram_id TEXT NOT NULL,
+        name TEXT NOT NULL,
+        data TEXT NOT NULL,
+        created_at INTEGER NOT NULL
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_revisions_diagram
+        ON revisions (diagram_id, created_at DESC);
 `);
 
 const configRow = db.prepare('SELECT data FROM config WHERE id = 1').get();

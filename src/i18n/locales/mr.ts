@@ -10,6 +10,7 @@ export const mr: LanguageTranslation = {
             dependencies: 'अवलंबने',
             custom_types: 'कस्टम प्रकार',
             visuals: 'Visuals',
+            revisions: 'पुनरावृत्ती',
         },
         menu: {
             actions: {
@@ -253,6 +254,10 @@ export const mr: LanguageTranslation = {
                     areas: 'क्षेत्रे',
                     notes: 'नोट्स',
                 },
+            },
+
+            revisions_section: {
+                revisions: 'पुनरावृत्ती',
             },
 
             notes_section: {

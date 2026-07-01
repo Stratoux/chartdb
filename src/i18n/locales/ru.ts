@@ -10,6 +10,7 @@ export const ru: LanguageTranslation = {
             dependencies: 'Зависимости',
             custom_types: 'Пользовательские типы',
             visuals: 'Визуальные элементы',
+            revisions: 'Ревизии',
         },
         menu: {
             actions: {
@@ -247,6 +248,10 @@ export const ru: LanguageTranslation = {
                     areas: 'Области',
                     notes: 'Заметки',
                 },
+            },
+
+            revisions_section: {
+                revisions: 'Ревизии',
             },
 
             notes_section: {

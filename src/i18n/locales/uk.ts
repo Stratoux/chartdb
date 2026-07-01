@@ -10,6 +10,7 @@ export const uk: LanguageTranslation = {
             dependencies: 'Залежності',
             custom_types: 'Користувацькі типи',
             visuals: 'Візуальні елементи',
+            revisions: 'Ревізії',
         },
         menu: {
             actions: {
@@ -248,6 +249,10 @@ export const uk: LanguageTranslation = {
                     areas: 'Області',
                     notes: 'Нотатки',
                 },
+            },
+
+            revisions_section: {
+                revisions: 'Ревізії',
             },
 
             notes_section: {

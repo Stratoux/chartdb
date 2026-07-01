@@ -10,6 +10,7 @@ export const zh_TW: LanguageTranslation = {
             dependencies: '相依性',
             custom_types: '自定義類型',
             visuals: '視覺效果',
+            revisions: '版本修訂',
         },
         menu: {
             actions: {
@@ -245,6 +246,10 @@ export const zh_TW: LanguageTranslation = {
                     areas: '區域',
                     notes: '筆記',
                 },
+            },
+
+            revisions_section: {
+                revisions: '版本修訂',
             },
 
             notes_section: {

@@ -10,6 +10,7 @@ export const pt_BR: LanguageTranslation = {
             dependencies: 'Dependências',
             custom_types: 'Tipos Personalizados',
             visuals: 'Visuais',
+            revisions: 'Revisões',
         },
         menu: {
             actions: {
@@ -250,6 +251,10 @@ export const pt_BR: LanguageTranslation = {
                     areas: 'Áreas',
                     notes: 'Notas',
                 },
+            },
+
+            revisions_section: {
+                revisions: 'Revisões',
             },
 
             notes_section: {

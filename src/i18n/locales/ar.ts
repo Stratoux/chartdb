@@ -10,6 +10,7 @@ export const ar: LanguageTranslation = {
             dependencies: 'التبعيات',
             custom_types: 'الأنواع المخصصة',
             visuals: 'مرئيات',
+            revisions: 'المراجعات',
         },
         menu: {
             actions: {
@@ -247,6 +248,10 @@ export const ar: LanguageTranslation = {
                     areas: 'المناطق',
                     notes: 'ملاحظات',
                 },
+            },
+
+            revisions_section: {
+                revisions: 'المراجعات',
             },
 
             notes_section: {

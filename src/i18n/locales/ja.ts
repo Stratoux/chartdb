@@ -10,6 +10,7 @@ export const ja: LanguageTranslation = {
             dependencies: '依存関係',
             custom_types: 'カスタムタイプ',
             visuals: 'ビジュアル',
+            revisions: 'リビジョン',
         },
         menu: {
             actions: {
@@ -252,6 +253,10 @@ export const ja: LanguageTranslation = {
                     areas: 'エリア',
                     notes: 'ノート',
                 },
+            },
+
+            revisions_section: {
+                revisions: 'リビジョン',
             },
 
             notes_section: {

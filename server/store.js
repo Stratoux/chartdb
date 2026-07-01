@@ -34,6 +34,30 @@ const updateConfigStmt = db.prepare(
     'UPDATE config SET data = ? WHERE id = 1'
 );
 
+const listRevisionsStmt = db.prepare(
+    'SELECT id, diagram_id, name, created_at FROM revisions WHERE diagram_id = ? ORDER BY created_at DESC'
+);
+const getRevisionStmt = db.prepare('SELECT * FROM revisions WHERE id = ?');
+const insertRevisionStmt = db.prepare(
+    'INSERT INTO revisions (id, diagram_id, name, data, created_at) VALUES (?, ?, ?, ?, ?)'
+);
+const renameRevisionStmt = db.prepare(
+    'UPDATE revisions SET name = ? WHERE id = ?'
+);
+const deleteRevisionStmt = db.prepare('DELETE FROM revisions WHERE id = ?');
+const deleteRevisionsByDiagramStmt = db.prepare(
+    'DELETE FROM revisions WHERE diagram_id = ?'
+);
+
+function revisionMeta(row) {
+    return {
+        id: row.id,
+        diagramId: row.diagram_id,
+        name: row.name,
+        createdAt: row.created_at,
+    };
+}
+
 function readDiagram(id) {
     const row = getStmt.get(id);
     if (!row) return null;
@@ -118,6 +142,7 @@ export const store = {
     deleteDiagram(id) {
         deleteStmt.run(id);
         deleteFilterStmt.run(id);
+        deleteRevisionsByDiagramStmt.run(id);
     },
 
     // ------ collection helpers ------
@@ -231,5 +256,39 @@ export const store = {
 
     deleteFilter(diagramId) {
         deleteFilterStmt.run(diagramId);
+    },
+
+    // ------ revisions ------
+    // List revisions for a diagram (metadata only, no snapshot data).
+    listRevisions(diagramId) {
+        return listRevisionsStmt.all(diagramId).map(revisionMeta);
+    },
+
+    // Get a single revision including its full diagram snapshot.
+    getRevision(id) {
+        const row = getRevisionStmt.get(id);
+        if (!row) return null;
+        return { ...revisionMeta(row), diagram: JSON.parse(row.data) };
+    },
+
+    // Persist a new revision from a client-provided diagram snapshot.
+    addRevision({ id, diagramId, name, diagram, createdAt }) {
+        insertRevisionStmt.run(
+            id,
+            diagramId,
+            name,
+            JSON.stringify(diagram),
+            createdAt ?? Date.now()
+        );
+        return { id, diagramId, name, createdAt: createdAt ?? Date.now() };
+    },
+
+    renameRevision(id, name) {
+        const info = renameRevisionStmt.run(name, id);
+        return info.changes > 0;
+    },
+
+    deleteRevision(id) {
+        deleteRevisionStmt.run(id);
     },
 };

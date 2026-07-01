@@ -10,6 +10,7 @@ export const id_ID: LanguageTranslation = {
             dependencies: 'Ketergantungan',
             custom_types: 'Tipe Kustom',
             visuals: 'Visual',
+            revisions: 'Revisi',
         },
         menu: {
             actions: {
@@ -248,6 +249,10 @@ export const id_ID: LanguageTranslation = {
                     areas: 'Area',
                     notes: 'Catatan',
                 },
+            },
+
+            revisions_section: {
+                revisions: 'Revisi',
             },
 
             notes_section: {

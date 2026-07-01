@@ -221,6 +221,24 @@ const updateTables = ({
         sourceTablesByKey.set(key, table);
     });
 
+    // Compute a spawn position for target tables that don't match any source
+    // table (new or renamed tables). DBML import lays them out on a generic
+    // grid starting at (0, 0), which would clobber the existing layout. Instead
+    // we drop them to the right of the current diagram's bounding box so the
+    // user's existing table positions are never disturbed.
+    const positionedSourceTables = sourceTables.filter(
+        (t) => typeof t.x === 'number' && typeof t.y === 'number'
+    );
+    const unmatchedSpawnBaseX =
+        positionedSourceTables.length > 0
+            ? Math.max(...positionedSourceTables.map((t) => t.x)) + 300
+            : 0;
+    const unmatchedSpawnBaseY =
+        positionedSourceTables.length > 0
+            ? Math.min(...positionedSourceTables.map((t) => t.y))
+            : 0;
+    let unmatchedTableIndex = 0;
+
     const updatedTables = targetTables.map((targetTable) => {
         // Try to find matching source table by schema + name
         const targetKey = createObjectKeyFromTable(targetTable);
@@ -250,8 +268,17 @@ const updateTables = ({
         }
 
         if (!sourceTable) {
-            // No matching source table found - keep target as-is
-            return targetTable;
+            // No matching source table found (new or renamed table). Keep the
+            // target as-is, but override the generic import grid position so it
+            // spawns next to the existing layout instead of near the origin.
+            const spawnRow = Math.floor(unmatchedTableIndex / 4);
+            const spawnCol = unmatchedTableIndex % 4;
+            unmatchedTableIndex++;
+            return {
+                ...targetTable,
+                x: unmatchedSpawnBaseX + spawnCol * 300,
+                y: unmatchedSpawnBaseY + spawnRow * 300,
+            };
         }
 
         const sourceId = sourceTable.id;

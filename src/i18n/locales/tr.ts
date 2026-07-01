@@ -10,6 +10,7 @@ export const tr: LanguageTranslation = {
             dependencies: 'Bağımlılıklar',
             custom_types: 'Özel Tipler',
             visuals: 'Görseller',
+            revisions: 'Revizyonlar',
         },
         menu: {
             actions: {
@@ -249,6 +250,10 @@ export const tr: LanguageTranslation = {
                     areas: 'Alanlar',
                     notes: 'Notlar',
                 },
+            },
+
+            revisions_section: {
+                revisions: 'Revizyonlar',
             },
 
             notes_section: {

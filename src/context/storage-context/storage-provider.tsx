@@ -10,7 +10,23 @@ import type { Area } from '@/lib/domain/area';
 import type { DBCustomType } from '@/lib/domain/db-custom-type';
 import type { DiagramFilter } from '@/lib/domain/diagram-filter/diagram-filter';
 import type { Note } from '@/lib/domain/note';
+import type { DiagramRevision } from '@/lib/domain/diagram-revision';
 import { apiFetch, buildQuery, reviveDates } from '@/lib/api/client';
+import { generateId } from '@/lib/utils';
+
+// The server stores/returns revision `createdAt` as an epoch-millis integer,
+// which reviveDates (ISO-string based) doesn't convert. Normalize it here.
+function reviveRevision<T extends { createdAt: unknown; diagram?: unknown }>(
+    revision: T
+): T {
+    return {
+        ...revision,
+        createdAt: new Date(revision.createdAt as number),
+        diagram: revision.diagram
+            ? reviveDates(revision.diagram)
+            : revision.diagram,
+    };
+}
 
 export const StorageProvider: React.FC<React.PropsWithChildren> = ({
     children,
@@ -486,6 +502,64 @@ export const StorageProvider: React.FC<React.PropsWithChildren> = ({
         []
     );
 
+    // ---- Revisions ----
+    const listRevisions: StorageContext['listRevisions'] = useCallback(
+        async (diagramId) => {
+            const data = await apiFetch<DiagramRevision[]>(
+                `/diagrams/${diagramId}/revisions`
+            );
+            return data.map(reviveRevision);
+        },
+        []
+    );
+
+    const getRevision: StorageContext['getRevision'] = useCallback(
+        async ({ diagramId, id }) => {
+            try {
+                const data = await apiFetch<DiagramRevision>(
+                    `/diagrams/${diagramId}/revisions/${id}`
+                );
+                return reviveRevision(data);
+            } catch {
+                return undefined;
+            }
+        },
+        []
+    );
+
+    const saveRevision: StorageContext['saveRevision'] = useCallback(
+        async ({ diagramId, name, diagram }) => {
+            const data = await apiFetch<DiagramRevision>(
+                `/diagrams/${diagramId}/revisions`,
+                {
+                    method: 'POST',
+                    body: JSON.stringify({ id: generateId(), name, diagram }),
+                }
+            );
+            return reviveRevision(data);
+        },
+        []
+    );
+
+    const renameRevision: StorageContext['renameRevision'] = useCallback(
+        async ({ diagramId, id, name }) => {
+            await apiFetch(`/diagrams/${diagramId}/revisions/${id}`, {
+                method: 'PATCH',
+                body: JSON.stringify({ name }),
+            });
+        },
+        []
+    );
+
+    const deleteRevision: StorageContext['deleteRevision'] = useCallback(
+        async ({ diagramId, id }) => {
+            await apiFetch(`/diagrams/${diagramId}/revisions/${id}`, {
+                method: 'DELETE',
+            });
+        },
+        []
+    );
+
     return (
         <storageContext.Provider
             value={{
@@ -536,6 +610,11 @@ export const StorageProvider: React.FC<React.PropsWithChildren> = ({
                 getDiagramFilter,
                 updateDiagramFilter,
                 deleteDiagramFilter,
+                listRevisions,
+                getRevision,
+                saveRevision,
+                renameRevision,
+                deleteRevision,
             }}
         >
             {children}

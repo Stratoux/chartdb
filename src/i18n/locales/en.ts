@@ -10,6 +10,7 @@ export const en = {
             dependencies: 'Dependencies',
             custom_types: 'Custom Types',
             visuals: 'Visuals',
+            revisions: 'Revisions',
         },
         menu: {
             actions: {
@@ -243,6 +244,10 @@ export const en = {
                     areas: 'Areas',
                     notes: 'Notes',
                 },
+            },
+
+            revisions_section: {
+                revisions: 'Revisions',
             },
 
             notes_section: {

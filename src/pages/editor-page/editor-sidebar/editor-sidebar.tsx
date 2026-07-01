@@ -17,6 +17,7 @@ import {
     Plus,
     FolderOpen,
     CodeXml,
+    History,
 } from 'lucide-react';
 import { Table, Workflow } from 'lucide-react';
 import { useLayout } from '@/hooks/use-layout';
@@ -127,6 +128,15 @@ export const EditorSidebar: React.FC<EditorSidebarProps> = () => {
                     selectVisualsTab('areas');
                 },
                 active: selectedSidebarSection === 'visuals',
+            },
+            {
+                title: t('editor_sidebar.revisions'),
+                icon: History,
+                onClick: () => {
+                    showSidePanel();
+                    selectSidebarSection('revisions');
+                },
+                active: selectedSidebarSection === 'revisions',
             },
         ],
         [

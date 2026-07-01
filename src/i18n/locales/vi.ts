@@ -10,6 +10,7 @@ export const vi: LanguageTranslation = {
             dependencies: 'Phụ thuộc',
             custom_types: 'Kiểu tùy chỉnh',
             visuals: 'Hình ảnh',
+            revisions: 'Phiên bản',
         },
         menu: {
             actions: {
@@ -248,6 +249,10 @@ export const vi: LanguageTranslation = {
                     areas: 'Khu vực',
                     notes: 'Ghi chú',
                 },
+            },
+
+            revisions_section: {
+                revisions: 'Phiên bản',
             },
 
             notes_section: {

@@ -10,6 +10,7 @@ export const bn: LanguageTranslation = {
             dependencies: 'নির্ভরতা',
             custom_types: 'কাস্টম টাইপ',
             visuals: 'ভিজ্যুয়াল',
+            revisions: 'রিভিশন',
         },
         menu: {
             actions: {
@@ -250,6 +251,10 @@ export const bn: LanguageTranslation = {
                     areas: 'এলাকা',
                     notes: 'নোট',
                 },
+            },
+
+            revisions_section: {
+                revisions: 'রিভিশন',
             },
 
             notes_section: {

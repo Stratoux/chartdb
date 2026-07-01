@@ -10,6 +10,7 @@ export const ko_KR: LanguageTranslation = {
             dependencies: '종속성',
             custom_types: '사용자 지정 타입',
             visuals: '시각화',
+            revisions: '리비전',
         },
         menu: {
             actions: {
@@ -248,6 +249,10 @@ export const ko_KR: LanguageTranslation = {
                     areas: '영역',
                     notes: '메모',
                 },
+            },
+
+            revisions_section: {
+                revisions: '리비전',
             },
 
             notes_section: {

@@ -10,6 +10,7 @@ export const gu: LanguageTranslation = {
             dependencies: 'નિર્ભરતાઓ',
             custom_types: 'કસ્ટમ ટાઇપ',
             visuals: 'Visuals',
+            revisions: 'પુનરાવર્તનો',
         },
         menu: {
             actions: {
@@ -250,6 +251,10 @@ export const gu: LanguageTranslation = {
                     areas: 'વિસ્તારો',
                     notes: 'નોંધો',
                 },
+            },
+
+            revisions_section: {
+                revisions: 'પુનરાવર્તનો',
             },
 
             notes_section: {
