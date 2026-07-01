@@ -1,9 +1,13 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { apiFetch, ApiError } from '@/lib/api/client';
+import { apiFetch, ApiError, getClientId } from '@/lib/api/client';
 import { lockContext, type LockState } from './lock-context';
 
 const HEARTBEAT_INTERVAL_MS = 10_000;
+// While read-only, keep polling so the diagram unlocks automatically as soon as
+// the other session releases the lock or its lock expires (see LOCK_TTL_MS on
+// the server) — without the user having to click "retry".
+const READONLY_RETRY_INTERVAL_MS = 5_000;
 
 interface AcquireResponse {
     ok: boolean;
@@ -101,22 +105,38 @@ export const LockProvider: React.FC<React.PropsWithChildren> = ({
         return () => stopHeartbeat();
     }, [diagramId, state.status, stopHeartbeat]);
 
+    // Auto-retry while read-only so we reclaim the lock the moment it frees up.
+    useEffect(() => {
+        if (!diagramId || state.status !== 'readonly') return;
+        const interval = setInterval(() => {
+            setRetryCounter((n) => n + 1);
+        }, READONLY_RETRY_INTERVAL_MS);
+        return () => clearInterval(interval);
+    }, [diagramId, state.status]);
+
     useEffect(() => {
         if (!diagramId) return;
         const release = () => {
-            // sendBeacon for reliable release on tab close.
-            const url = `/api/diagrams/${diagramId}/lock`;
-            navigator.sendBeacon?.(url + '?_method=DELETE');
-            // Best-effort fetch as well (sendBeacon doesn't support DELETE directly,
-            // so we rely on the server treating expired locks as releasable, plus a
-            // direct DELETE that may complete on tab close in some browsers).
-            try {
-                apiFetch(`/diagrams/${diagramId}/lock`, {
-                    method: 'DELETE',
-                    keepalive: true,
-                }).catch(() => {});
-            } catch {
-                /* ignore */
+            // Primary path: sendBeacon (POST) to the beacon-friendly release
+            // endpoint. sendBeacon can't set headers, so the client id travels
+            // in the body. This is the reliable way to drop the lock on tab
+            // close, so the diagram doesn't stay stuck as "read-only" elsewhere.
+            const beaconUrl = `/api/diagrams/${diagramId}/lock/release`;
+            const payload = JSON.stringify({ clientId: getClientId() });
+            const sent = navigator.sendBeacon?.(
+                beaconUrl,
+                new Blob([payload], { type: 'application/json' })
+            );
+            // Fallback for browsers where sendBeacon is unavailable/failed.
+            if (!sent) {
+                try {
+                    apiFetch(`/diagrams/${diagramId}/lock`, {
+                        method: 'DELETE',
+                        keepalive: true,
+                    }).catch(() => {});
+                } catch {
+                    /* ignore */
+                }
             }
         };
         window.addEventListener('beforeunload', release);

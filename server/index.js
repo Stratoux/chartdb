@@ -55,6 +55,15 @@ app.delete('/api/diagrams/:diagramId/lock', (req, res) => {
     res.json(result);
 });
 
+// Beacon-friendly release: navigator.sendBeacon can only issue POST requests
+// and can't set custom headers, so the client id is sent in the body. Used to
+// reliably drop the lock on tab close / navigation.
+app.post('/api/diagrams/:diagramId/lock/release', (req, res) => {
+    const id = req.body?.clientId || clientId(req);
+    const result = releaseLock(req.params.diagramId, id);
+    res.json(result);
+});
+
 // ---------- Config ----------
 app.get('/api/config', (req, res) => {
     res.json(store.getConfig() ?? null);
