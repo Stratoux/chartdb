@@ -188,18 +188,26 @@ describe('generateDrizzleSchema (mysql)', () => {
     });
 
     it('emits inline references() for the FK column', () => {
-        // JS key is camelCased (seasonId) but the column string keeps the
-        // original name ("seasonID"), matching drizzle-kit pull behavior.
+        // The property key must equal the DB column name verbatim ("seasonID").
         expect(code).toContain(
-            'seasonId: bigint("seasonID", { mode: "number" }).notNull().references(() => season.id),'
+            'seasonID: bigint("seasonID", { mode: "number" }).notNull().references(() => season.id),'
         );
     });
 
     it('emits index() and primaryKey() in the table callback', () => {
-        expect(code).toContain('index("seasonID").on(table.seasonId),');
+        expect(code).toContain('index("seasonID").on(table.seasonID),');
         expect(code).toContain(
             'primaryKey({ columns: [table.id], name: "Competition_id"}),'
         );
+    });
+
+    it('property key equals the column-name string for every column', () => {
+        // No line where a property ends in lowercase "Id" while its column
+        // string ends in uppercase "ID" (the bug this fixes).
+        const offending = code
+            .split('\n')
+            .filter((l) => /^\s*\w*Id:\s*\w+\("\w*ID"/.test(l));
+        expect(offending).toEqual([]);
     });
 
     it('only imports the builders it uses', () => {

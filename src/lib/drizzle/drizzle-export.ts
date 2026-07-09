@@ -64,6 +64,21 @@ const camelCase = (name: string): string => {
 
 const quote = (s: string): string => `"${s.replace(/"/g, '\\"')}"`;
 
+// The TS property key for a column MUST equal its DB column-name string
+// verbatim (e.g. "courseID" -> courseID, not courseId). If the raw name is not
+// a valid bare identifier (spaces, punctuation, leading digit), quote it so the
+// generated object literal still parses; the key text still matches the name.
+const isValidIdentifier = (name: string): boolean =>
+    /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(name);
+
+const columnKey = (name: string): string =>
+    isValidIdentifier(name) ? name : quote(name);
+
+// A reference to a column property on the `table` object, e.g. table.courseID
+// or table["weird name"]. Must use the same verbatim key as the definition.
+const columnAccess = (name: string): string =>
+    isValidIdentifier(name) ? `table.${name}` : `table[${quote(name)}]`;
+
 // Map a ChartDB field to a Drizzle column builder for the given dialect.
 const buildColumn = (field: DBField, dialect: Dialect): ColumnBuild => {
     const typeId = field.type.id.toLowerCase();
@@ -353,7 +368,7 @@ const buildTableExtras = (
 
     const colRef = (fieldId: string): string | null => {
         const f = fieldById.get(fieldId);
-        return f ? `table.${camelCase(f.name)}` : null;
+        return f ? columnAccess(f.name) : null;
     };
 
     // Primary key columns (from fields flagged primaryKey, or a PK index).
@@ -383,9 +398,7 @@ const buildTableExtras = (
             .map(colRef)
             .filter((c): c is string => c !== null);
     } else if (pkFields.length > 0) {
-        pkCols = pkFields
-            .map((f) => `table.${camelCase(f.name)}`)
-            .filter(Boolean);
+        pkCols = pkFields.map((f) => columnAccess(f.name)).filter(Boolean);
     }
     if (pkCols.length > 0) {
         const pkName = `${table.name}_${(pkFromIndex
@@ -500,15 +513,18 @@ export const generateDrizzleSchema = (
                 }
             }
 
-            // Foreign key reference.
+            // Foreign key reference. The referenced column must use the raw
+            // column name too (verbatim), keyed off the referenced table export.
             const ref = refMap.get(field.id);
             if (ref) {
-                expr += `.references(() => ${ref.tableExport}.${camelCase(
-                    ref.columnName
-                )})`;
+                const refCol = isValidIdentifier(ref.columnName)
+                    ? `${ref.tableExport}.${ref.columnName}`
+                    : `${ref.tableExport}[${quote(ref.columnName)}]`;
+                expr += `.references(() => ${refCol})`;
             }
 
-            columnLines.push(`\t${camelCase(field.name)}: ${expr},`);
+            // Property key is the DB column name verbatim (not camelCased).
+            columnLines.push(`\t${columnKey(field.name)}: ${expr},`);
         }
 
         const extras = buildTableExtras(table, fieldById);
